@@ -7,6 +7,7 @@ import {
   input,
   effect,
   computed,
+  model,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -18,13 +19,19 @@ import { CommonModule } from '@angular/common';
 export class CounterComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
+// effect(()=>{
+//   this.duration();
+//   this.doSomething();
+// });
+
   //input signals $ recomended for signals
   $duration = input.required<number>({alias: 'duration' });
   $doubleDuration = computed(()=> this.$duration()*2);
-  $message = input.required<string>({alias: 'message' });
+  $message = model.required<string>({alias: 'message' });
+  
   $counter = signal(0);
   counterRef: number | undefined;
-
+  
   constructor() {
     // NO ASYNC
     // before render
@@ -85,12 +92,17 @@ export class CounterComponent
   }
 
   doSomething() {
-    console.log('change duration');
+    console.log('change duration'); //
     // async
   }
 
   doSomethingTwo(){
     console.log('change message');
     // async
+  }
+
+  setMessage() {
+    this.$message.set(Math.random().toString());
+   
   }
 }
