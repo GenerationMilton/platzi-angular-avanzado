@@ -14,7 +14,7 @@ import { CartService } from '@shared/services/cart.service';
 import { ProductService } from '@shared/services/product.service';
 import { CategoryService } from '@shared/services/category.service';
 // import { Category } from '@shared/models/category.model';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-list',
@@ -30,9 +30,17 @@ export default class ListComponent implements OnChanges {
 
   products = signal<Product[]>([]);
   //categories = signal<Category[]>([]);
-  $categories = toSignal(this.categoryService.getAll(),{
-    initialValue: [],
-  })
+  loadingProducts = signal(false);
+  errorProducts = signal('');
+
+  // $categories = toSignal(this.categoryService.getAll(),{
+  //   initialValue: [],
+  // })
+
+    categoriesResource = rxResource({
+      stream: () => this.categoriesResource.getAll(),
+    });
+
 
   // ngOnInit() {
   //   this.getCategories();
@@ -51,6 +59,11 @@ export default class ListComponent implements OnChanges {
       next: (products) => {
         this.products.set(products);
       },
+      error: error => {
+        this.errorProducts.set(error.message);
+        this.loadingProducts.set(false);
+        this.products.set([]);
+      }
     });
   }
 
@@ -61,4 +74,13 @@ export default class ListComponent implements OnChanges {
   //     },
   //   });
   // }
+
+  resetCategories() {
+    this.categoriesResource.set([]);
+  
+  }
+
+  reloadCategories(){
+    this.categoriesResource.reload();
+  }
 }
